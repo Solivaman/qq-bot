@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # --- 机器人核心大脑：AstrBot ---
+  astrbot:
+    image: soulter/astrbot:latest
+    container_name: astrbot
+    restart: always
+    ports:
+      - "6185:6185" # AstrBot WebUI 管理后台端口
+      - "6199:6199" # 与 NapCat 通信的反向 WebSocket 端口
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./astrbot_data:/AstrBot/data
+
+  # --- QQ 协议端：NapCat ---
+  napcat:
+    image: mlikiowa/napcat-docker:latest
+    container_name: napcat
+    restart: always
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "6099:6099" # NapCat WebUI 管理后台端口
+    environment:
+      # 在 Linux/WSL 环境中获取你的 UID 和 GID 以解决权限问题
+      - NAPCAT_UID=1000
+      - NAPCAT_GID=1000
+    volumes:
+      - ./napcat_data:/app/.config/QQ
+      - ./napcat_config:/app/napcat/config
